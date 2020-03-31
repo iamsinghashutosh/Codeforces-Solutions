@@ -1,5 +1,5 @@
-/*A
-  Asshutosh Singh
+/*
+  Ashutosh Singh
   Problem Link:-https://codeforces.com/contest/1326/problem/D2
 */
 #include<bits/stdc++.h>
