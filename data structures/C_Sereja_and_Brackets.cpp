@@ -1,4 +1,4 @@
-/*
+/* 
  Ashutosh Singh
 */
 #include<bits/stdc++.h>
@@ -19,54 +19,55 @@ using namespace std;
 #define all(a) a.begin(),a.end()
 typedef tree<int,null_type,less_equal<int>,rb_tree_tag,tree_order_statistics_node_update>ordered_set;
 
-int t1[4*100001],t2[4*100001];
+int tot[4000005],open[4000005],close[4000005];
+string s;
 
 void build(int t,int tl,int tr)
 {
-    if(tl==tr)
+    if(tr==tl)
     {
-        t1[t]=a[tl];
-        t2[t]=a[tl];
+        if(s[tl]=='(')
+            open[t]=1;
+        else
+            close[t]=1;
         return;
     }
     int mid=(tl+tr)/2;
     build(2*t,tl,mid);
-    build(2*t+1,mid+1,tr);
-    t1[t]=__gcd(t1[2*t],t1[2*t+1]);
-    t2[t]=min(t2[2*t],t2[2*t+1]);
+    build(2*t +1,mid+1,tr);
+    int x=min(open[2*t],close[2*t+1]);
+    tot[t]=tot[2*t]+tot[2*t + 1]+2*x;
+    open[t]=open[2*t]+open[2*t+1]-x;
+    close[t]=close[2*t]+close[2*t+1]-x;
 }
 
-int getGCD(int t,int l,int r,int tl,int tr)
+pair<int,pair<int,int>> query(int t,int l,int r,int tl,int tr)
 {
-    if(l>r ||l>tr || r<tl )
-        return 1;
-    if(l<=tl && r>=tr)
-        return t1[t];
+    pair<int,pair<int,int>> p1,p2,ans;
+    if(l>tr || r<tl)
+    {
+        ans={0,{0,0}};
+        return ans;
+    }
+    if(tl>=l && tr<=r)
+       {
+           ans={tot[t],{open[t],close[t]}};
+            return ans;
+       }
     int mid=(tl+tr)/2;
-    int x1=getGCD(2*t,l,r,tl,mid);
-    int x2=getGCD(2*t+1,l,r,mid+1,tr);
-    return __gcd(x1,x2);
-}
-
-int getMin(int t,int l,int r,int tl,int tr)
-{
-    if(l>r ||l>tr || r<tl )
-        return 1;
-    if(l<=tl && r>=tr)
-        return t2[t];
-    int mid=(tl+tr)/2;
-    int x1=getMin(2*t,l,r,tl,mid);
-    int x2=getMin(2*t+1,l,r,mid+1,tr);
-    return min(x1,x2);
+    p1=query(2*t,l,r,tl,mid);
+    p2=query(2*t+1,l,r,mid+1,tr);
+    int x=min(p1.S.F,p2.S.S);
+    ans.F=p1.F + p2.F + 2*x;
+    ans.S.F=p1.S.F + p2.S.F -x;
+    ans.S.S=p1.S.S + p2.S.S -x;
+    return ans;
 }
 
 void solve()
 {
-  int n;
-  cin >> n;
-  f(i,n)
-    cin >> a[i];
-  build(1,0,n-1);
+  cin >> s;
+  build(1,0,s.length()-1);
   int q;
   cin >> q;
   while(q--)
@@ -74,12 +75,8 @@ void solve()
       int l,r;
       cin >> l >> r;
       l--,r--;
-      int x=getGCD(1,l,r,0,n-1);
-      int y=getMin(1,l,r,0,n-1);
-      if(x==y)
-         {
-             int z=getFreq(1,l,r,0,n-1,x);
-         }
+      cout << query(1,l,r,0,s.length()-1).F << '\n';
+
   }
   return ;
 } 
